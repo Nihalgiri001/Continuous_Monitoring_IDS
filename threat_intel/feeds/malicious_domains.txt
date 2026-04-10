@@ -1,0 +1,74 @@
+# ══════════════════════════════════════════════════════════════════
+# MALICIOUS DOMAIN BLACKLIST
+# ══════════════════════════════════════════════════════════════════
+# Sources to refresh from:
+#   • https://urlhaus.abuse.ch/downloads/text/
+#   • https://phishtank.org/developer_info.php
+#   • https://openphish.com/feed.txt
+#   • https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
+#   • https://malwaredomainlist.com/mdl.php
+#   • https://hole.cert.pl/domains/domains.txt
+#
+# Format: one domain per line (no http:// prefix, no trailing slash)
+# ══════════════════════════════════════════════════════════════════
+
+# ── Active Phishing Domains (URLhaus / PhishTank) ─────────────────
+secure-login-verify.tk
+paypal-account-suspended.ml
+apple-id-locked-verify.gq
+bank-alert-secure.cf
+amazon-prize-claim.ga
+netflix-billing-update.tk
+microsoft-security-alert.xyz
+google-account-disabled.info
+irs-refund-secure.tk
+fedex-parcel-update.ml
+
+# ── Malware Distribution / Dropper Domains ───────────────────────
+update-flash-player.ru
+free-software-download.biz
+crack-software-full.net
+keygen-download.ru
+virus-total-scan.biz
+install-update-now.ru
+download-free-antivirus.tk
+best-movie-download.ru
+
+# ── Ransomware C2 / Payload Domains ─────────────────────────────
+darkside-ransom.onion.to
+lockbit-blog.bz
+revil-c2-server.ru
+conti-leak.onion.to
+ryuk-ransomware.net
+alphv-blackcat.su
+
+# ── Cryptojacking / Coinhive Domains ─────────────────────────────
+coinhive.com
+coin-have.com
+cryptoloot.pro
+minero.cc
+webminerpool.com
+monerominer.rocks
+crypto-loot.com
+ppoi.org
+miner.pr0gramm.com
+
+# ── Known Adware / Spyware Domains ───────────────────────────────
+track-analytics-event.com
+super-analytics-cdn.net
+realtime-data-tracker.com
+ad-network-metrics.biz
+browser-sync-update.com
+telemetry-report-hub.net
+user-behaviour-track.com
+
+# ── Command & Control Infrastructure ─────────────────────────────
+xmrig-pool.monero.hashvault.pro
+pool.minexmr.com
+mine.xmrig.com
+c2-botnet-panel.ru
+rat-control-server.xyz
+keylogger-data-exfil.com
+malware-c2.example.com
+trojan-dropper.net
+ransomware-c2.onion.to

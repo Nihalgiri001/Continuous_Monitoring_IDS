@@ -1,0 +1,125 @@
+# ══════════════════════════════════════════════════════════════════
+# SUSPICIOUS / MALWARE PROCESS NAME BLACKLIST
+# ══════════════════════════════════════════════════════════════════
+# Sources / references:
+#   • MITRE ATT&CK T1059 (Command & Scripting Interpreter)
+#   • MITRE ATT&CK T1218 (Signed Binary Proxy Execution)
+#   • SANS "Malware Process Name" lists
+#   • Vendor threat reports (CrowdStrike, SentinelOne, etc.)
+#
+# Format: lowercase process name (basename only, no path)
+# ══════════════════════════════════════════════════════════════════
+
+# ── Network Hacking / Exploitation Tools ─────────────────────────
+netcat
+ncat
+nc
+nmap
+masscan
+zmap
+unicornscan
+hping3
+hping
+scapy
+
+# ── Password Cracking ─────────────────────────────────────────────
+john
+hashcat
+hydra
+medusa
+thc-hydra
+ophcrack
+crunch
+patator
+crowbar
+
+# ── Post-Exploitation / RAT Frameworks ───────────────────────────
+meterpreter
+metasploit
+msf
+msfconsole
+empire
+covenant
+havoc
+cobalt
+cs
+beacon
+pupy
+sliver
+brute-ratel
+deimos
+
+# ── Remote Access Trojans (known binary names) ───────────────────
+njrat
+darkcomet
+xtreme
+poisonivy
+blackrat
+remcos
+asyncrat
+nanocore
+quasar
+luminosity
+adwind
+jrat
+
+# ── Cryptominers ─────────────────────────────────────────────────
+xmrig
+minerd
+cpuminer
+cgminer
+bfgminer
+ethminer
+coinhive
+nbminer
+t-rex
+gminer
+teamredminer
+lolminer
+phoenixminer
+
+# ── Keyloggers / Spyware ─────────────────────────────────────────
+keylogger
+spyware
+hooklogger
+clipper
+formgrabber
+hawkeye
+agent_tesla
+lokibot
+
+# ── Packet Sniffers / MITM ───────────────────────────────────────
+wireshark
+tcpdump
+tshark
+ettercap
+bettercap
+arpspoof
+dsniff
+responder
+mitm6
+evilgrade
+
+# ── Privilege Escalation / Credential Dumping ────────────────────
+mimikatz
+procdump
+gsecdump
+wce
+fgdump
+lazagne
+pypykatz
+crackmapexec
+secretsdump
+
+# ── Backdoor / Rootkit Names ─────────────────────────────────────
+backdoor
+rootkit
+trojan
+syslogd64
+kworker1
+.hidden
+init32
+updater32
+svchost32
+svchostt
+lsas
