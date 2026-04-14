@@ -14,7 +14,7 @@ import numpy as np
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from config import ML_ANOMALY_SCORE_THRESHOLD
+from config import ML_ANOMALY_SCORE_THRESHOLD, ML_ANOMALY_CONSECUTIVE_HITS
 from core.event_queue import event_queue, threat_queue, safe_get, safe_put
 from core.threat_event import ThreatEvent, SystemSnapshot
 from ml_engine.trainer import load_model, ModelTrainer
@@ -34,20 +34,44 @@ class AnomalyDetector(threading.Thread):
         super().__init__(name="AnomalyDetector")
         self._trainer = trainer
         self._model = None
+        self._threshold = float(ML_ANOMALY_SCORE_THRESHOLD)
+        self._consecutive_hits = 0
         self._stop_event = threading.Event()
 
     def stop(self):
         self._stop_event.set()
 
+    def _hydrate_model(self, loaded):
+        """
+        Supports both legacy models (IsolationForest) and v2 model bundles:
+          {version:2, pipeline:<sklearn Pipeline>, threshold:<float>, ...}
+        """
+        if loaded is None:
+            self._model = None
+            return
+
+        if isinstance(loaded, dict) and "pipeline" in loaded:
+            self._model = loaded["pipeline"]
+            try:
+                self._threshold = float(loaded.get("threshold", self._threshold))
+            except Exception:
+                pass
+            return
+
+        # Legacy: raw sklearn model (IsolationForest)
+        self._model = loaded
+
     def _wait_for_model(self):
         # Try loading pre-existing model first
-        self._model = load_model()
+        loaded = load_model()
+        self._hydrate_model(loaded)
         if self._model is not None:
             logger.info("AnomalyDetector: loaded pre-existing model")
             return
         logger.info("AnomalyDetector: waiting for warm-up training to complete…")
         self._trainer.trained.wait()
-        self._model = load_model()
+        loaded = load_model()
+        self._hydrate_model(loaded)
         if self._model is None:
             logger.error("AnomalyDetector: model still unavailable after training")
 
@@ -62,7 +86,11 @@ class AnomalyDetector(threading.Thread):
             logger.warning("AnomalyDetector disabled — no model available")
             return
 
-        logger.info("AnomalyDetector active, threshold=%.3f", ML_ANOMALY_SCORE_THRESHOLD)
+        logger.info(
+            "AnomalyDetector active, threshold=%.4f, consecutive_hits=%d",
+            self._threshold,
+            ML_ANOMALY_CONSECUTIVE_HITS,
+        )
         while not self._stop_event.is_set():
             snap = safe_get(event_queue, timeout=1.0)
             if snap is None:
@@ -75,7 +103,12 @@ class AnomalyDetector(threading.Thread):
                 score = self._score_snapshot(snap)
                 logger.debug("ML score: %.4f", score)
 
-                if score < ML_ANOMALY_SCORE_THRESHOLD:
+                if score < self._threshold:
+                    self._consecutive_hits += 1
+                else:
+                    self._consecutive_hits = 0
+
+                if self._consecutive_hits >= int(ML_ANOMALY_CONSECUTIVE_HITS):
                     fv = snap.to_feature_vector()
                     evt = ThreatEvent(
                         rule_id="ML_ANOMALY",
@@ -87,12 +120,15 @@ class AnomalyDetector(threading.Thread):
                         raw_data={
                             "ml_score": score,
                             "feature_vector": fv,
-                            "threshold": ML_ANOMALY_SCORE_THRESHOLD,
+                            "threshold": self._threshold,
+                            "consecutive_hits": self._consecutive_hits,
+                            "required_hits": int(ML_ANOMALY_CONSECUTIVE_HITS),
                         },
                         source="ml_engine",
                     )
                     safe_put(threat_queue, evt)
                     logger.info("[ML ANOMALY] score=%.4f — %s", score, evt.description)
+                    self._consecutive_hits = 0
 
             except Exception as exc:
                 logger.error("AnomalyDetector scoring error: %s", exc)

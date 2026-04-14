@@ -13,15 +13,19 @@ from pathlib import Path
 
 import numpy as np
 from sklearn.ensemble import IsolationForest
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
 
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from config import ML_WARMUP_SAMPLES, ML_CONTAMINATION, MODEL_PATH
+from config import ML_WARMUP_SAMPLES, ML_CONTAMINATION, MODEL_PATH, ML_ANOMALY_SCORE_QUANTILE
 from core.event_queue import event_queue, safe_get
 from core.threat_event import SystemSnapshot
 
 logger = logging.getLogger(__name__)
+
+MODEL_VERSION = 2
 
 
 class ModelTrainer(threading.Thread):
@@ -61,16 +65,47 @@ class ModelTrainer(threading.Thread):
             event_queue.put(snap)
             logger.debug("Warm-up sample %d/%d", len(self._samples), ML_WARMUP_SAMPLES)
 
-    def _train(self) -> IsolationForest:
+    def _train(self) -> dict:
         X = np.array(self._samples)
-        model = IsolationForest(
-            n_estimators=100,
-            contamination=ML_CONTAMINATION,
-            random_state=42,
-            n_jobs=-1,
+        pipeline = Pipeline(
+            steps=[
+                ("scale", StandardScaler()),
+                (
+                    "iforest",
+                    IsolationForest(
+                        n_estimators=200,
+                        contamination=ML_CONTAMINATION,
+                        random_state=42,
+                        n_jobs=-1,
+                    ),
+                ),
+            ]
         )
-        model.fit(X)
-        return model
+        pipeline.fit(X)
+
+        # score_samples: higher = more normal, lower = more anomalous
+        scores = pipeline.score_samples(X)
+        q = float(ML_ANOMALY_SCORE_QUANTILE)
+        q = min(max(q, 1e-6), 0.2)  # guardrails against misconfig
+        calibrated_threshold = float(np.quantile(scores, q))
+
+        return {
+            "version": MODEL_VERSION,
+            "pipeline": pipeline,
+            "threshold": calibrated_threshold,
+            "score_quantile": q,
+            "score_stats": {
+                "min": float(np.min(scores)),
+                "p01": float(np.quantile(scores, 0.01)),
+                "p05": float(np.quantile(scores, 0.05)),
+                "median": float(np.median(scores)),
+                "p95": float(np.quantile(scores, 0.95)),
+                "max": float(np.max(scores)),
+            },
+            "trained_on_samples": int(X.shape[0]),
+            "n_features": int(X.shape[1]) if X.ndim == 2 else 0,
+            "trained_at": time.time(),
+        }
 
     def run(self):
         self._collect_samples()
@@ -79,16 +114,21 @@ class ModelTrainer(threading.Thread):
 
         logger.info("Training IsolationForest on %d samples…", len(self._samples))
         try:
-            model = self._train()
+            model_bundle = self._train()
             MODEL_PATH.parent.mkdir(parents=True, exist_ok=True)
-            joblib.dump(model, MODEL_PATH)
-            logger.info("✅ ML model trained & saved → %s", MODEL_PATH)
+            joblib.dump(model_bundle, MODEL_PATH)
+            logger.info(
+                "✅ ML model trained & saved → %s (threshold=%.4f, q=%.4f)",
+                MODEL_PATH,
+                model_bundle.get("threshold", float("nan")),
+                model_bundle.get("score_quantile", float("nan")),
+            )
             self.trained.set()
         except Exception as exc:
             logger.error("ML training failed: %s", exc, exc_info=True)
 
 
-def load_model() -> IsolationForest | None:
+def load_model() -> dict | IsolationForest | None:
     if MODEL_PATH.exists():
         try:
             return joblib.load(MODEL_PATH)

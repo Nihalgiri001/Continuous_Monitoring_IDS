@@ -30,7 +30,11 @@ WATCHED_PATHS = [
 MONITORING_INTERVAL_SECONDS = 5        # How often to collect a system snapshot
 ML_WARMUP_SAMPLES = 600               # Samples to collect before training ML model (increased from 30)
 ML_CONTAMINATION = 0.01               # Expected fraction of anomalies (1%, reduced from 5%)
-ML_ANOMALY_SCORE_THRESHOLD = -0.10    # IsolationForest score below this = anomaly (less aggressive, was -0.25)
+# NOTE: Score thresholds are now auto-calibrated from warm-up baseline when possible.
+# The static threshold remains as a fallback for legacy models.
+ML_ANOMALY_SCORE_THRESHOLD = -0.10    # Fallback: IsolationForest score below this = anomaly
+ML_ANOMALY_SCORE_QUANTILE = 0.001     # Calibrated threshold = this quantile of baseline scores (lower = less alerts)
+ML_ANOMALY_CONSECUTIVE_HITS = 3       # Require N consecutive anomalous scores before raising ML_ANOMALY
 
 # ──────────────────────────────────────────────
 # Rule-Based Detection Thresholds
