@@ -22,6 +22,9 @@ from config import ALERT_COOLDOWN_SECONDS
 from core.event_queue import threat_queue, vuln_queue, safe_get
 from core.threat_event import ThreatEvent
 from core.severity import Severity
+from core.risk_scoring import RiskScoringEngine
+from core.mitre_mapping import map_rule_to_mitre
+from alerts.response.auto_response import AutonomousResponseEngine
 
 logger = logging.getLogger(__name__)
 
@@ -39,6 +42,8 @@ class AlertManager(threading.Thread):
         self._db = db
         self._notifiers = notifiers or []
         self._stop_event = threading.Event()
+        self._risk = RiskScoringEngine()
+        self._auto = AutonomousResponseEngine()
 
         # Cooldown tracker: rule_id+key → last_alert_timestamp
         # key is derived from the alert (e.g. IP, process name, port)
@@ -75,6 +80,34 @@ class AlertManager(threading.Thread):
     # ── Dispatch ──────────────────────────────────────────────────────────────
 
     def _dispatch(self, event: ThreatEvent):
+        # Enrich with risk score + MITRE mapping + optional auto-response actions.
+        try:
+            rs = self._risk.score(event)
+            event.risk_score = rs.score
+            event.risk_label = rs.label
+            event.computed_severity = rs.label  # use risk-derived label for UI/DB
+            # Preserve breakdown for explainability / audits
+            event.raw_data = event.raw_data or {}
+            event.raw_data["risk_breakdown"] = rs.breakdown
+        except Exception as e:
+            logger.debug("Risk scoring failed: %s", e)
+
+        try:
+            mm = map_rule_to_mitre(event.rule_id)
+            if mm:
+                event.mitre_tactic = mm.tactic
+                event.mitre_technique = mm.technique
+        except Exception:
+            pass
+
+        try:
+            if event.risk_score is not None:
+                action_str = self._auto.respond(event, int(event.risk_score))
+                if action_str:
+                    event.auto_action_taken = action_str
+        except Exception as e:
+            logger.debug("Auto-response failed: %s", e)
+
         if self._db:
             try:
                 self._db.insert_threat(event)

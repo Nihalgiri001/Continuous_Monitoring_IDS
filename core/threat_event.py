@@ -25,6 +25,13 @@ class ThreatEvent:
     severity: Severity = field(init=False)
     source: str = "rules_engine"   # rules_engine | ml_engine | scanner | threat_intel
     resolved: bool = False
+    # Enrichment fields (set later in AlertManager pipeline)
+    computed_severity: Optional[str] = None  # Low/Medium/High/Critical/Anomaly
+    risk_score: Optional[int] = None
+    risk_label: Optional[str] = None  # Low/Medium/High/Critical
+    mitre_tactic: Optional[str] = None
+    mitre_technique: Optional[str] = None
+    auto_action_taken: Optional[str] = None  # e.g. "kill_process,pf_block,quarantine"
 
     def __post_init__(self):
         self.severity = get_severity(self.rule_id)
@@ -36,7 +43,8 @@ class ThreatEvent:
 
     def to_dict(self) -> dict:
         d = asdict(self)
-        d["severity"] = self.severity.value
+        # Prefer computed/enriched severity label when available.
+        d["severity"] = self.computed_severity or self.severity.value
         d["timestamp_iso"] = self.timestamp_iso
         return d
 

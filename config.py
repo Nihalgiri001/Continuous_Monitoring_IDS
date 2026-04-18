@@ -60,6 +60,21 @@ EMAIL_PASSWORD = os.getenv("ALERT_EMAIL_PASSWORD", "")
 ENABLE_AUTO_BLOCK_IPS = False
 ENABLE_AUTO_KILL_PROCESSES = False
 
+# Autonomous response policy (risk-score driven)
+# Risk score severity labels:
+#   0-30 Low, 31-60 Medium, 61-80 High, 81-100 Critical
+ENABLE_AUTONOMOUS_RESPONSE = False
+AUTO_RESPONSE_SAFE_MODE = True   # if True, destructive actions are no-ops but logged
+
+# Risk thresholds for actions
+RISK_THRESHOLD_MEDIUM = 31
+RISK_THRESHOLD_HIGH = 61
+RISK_THRESHOLD_CRITICAL = 81
+
+# Quarantine
+QUARANTINE_DIR = BASE_DIR / "quarantine"
+QUARANTINE_DIR.mkdir(parents=True, exist_ok=True)
+
 # ──────────────────────────────────────────────
 # Vulnerability Scanner
 # ──────────────────────────────────────────────

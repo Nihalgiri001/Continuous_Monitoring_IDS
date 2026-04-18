@@ -112,6 +112,18 @@ def api_threats():
     return jsonify({"threats": threats, "counts": counts})
 
 
+@app.route("/api/risk")
+def api_risk():
+    """
+    Returns a lightweight snapshot of the latest risk posture for UI widgets.
+    """
+    if _db is None:
+        return jsonify({"latest": None})
+    threats = _db.get_threats(limit=1)
+    latest = threats[0] if threats else None
+    return jsonify({"latest": latest})
+
+
 @app.route("/api/vulnerabilities")
 def api_vulnerabilities():
     if _db is None:

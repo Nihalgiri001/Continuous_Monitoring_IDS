@@ -498,6 +498,35 @@
     </div>
   </div>
 
+  <!-- Row 1b: Risk score + Top suspicious processes -->
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">🎯 Risk Score</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span id="risk-label" style="font-family:var(--mono);color:var(--text-muted);font-size:0.75rem;">—</span>
+          <span id="risk-score" class="stat-value" style="font-size:1.6rem;margin:0;line-height:1;">—</span>
+        </div>
+      </div>
+      <div class="gauge-row" style="margin-bottom:0;">
+        <div class="gauge-label"><span>0</span><span>100</span></div>
+        <div class="gauge-bar" style="height:10px;">
+          <div class="gauge-fill" id="gf-risk" style="width:0%"></div>
+        </div>
+        <div class="stat-sub" id="risk-meta" style="margin-top:10px;"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">⚠️ Top Suspicious Processes</div>
+      </div>
+      <div id="top-procs" style="display:flex;flex-direction:column;gap:8px;max-height:170px;overflow:auto;">
+        <div class="empty-state" style="padding:18px"><div class="icon">⚙️</div>No process data yet</div>
+      </div>
+    </div>
+  </div>
+
   <!-- Row 2: System health + Threat history chart -->
   <div class="grid-3">
     <!-- Left: Gauge bars + Severity breakdown -->
@@ -698,14 +727,45 @@ function renderThreatItem(ev) {
 
   const div = document.createElement('div');
   div.className = `threat-item ${sev}`;
+  const risk = (ev.risk_score != null) ? ` • Risk ${ev.risk_score}` : '';
+  const mitre = ev.mitre_tactic ? ` • ${ev.mitre_tactic}` : '';
   div.innerHTML = `
     <span class="threat-badge badge-${sev}">${sev}</span>
     <div class="threat-body">
-      <div class="threat-rule">${ev.rule_id}</div>
+      <div class="threat-rule">${ev.rule_id}<span style="color:var(--text-muted);font-weight:500;font-family:var(--font);"> ${risk}${mitre}</span></div>
       <div class="threat-desc">${ev.description || ''}</div>
+      ${renderExtra(ev)}
     </div>
     <span class="threat-ts">${fmtTs(ev.timestamp)}</span>`;
   return div;
+}
+
+function renderExtra(ev) {
+  // Explanation reasons (ML) or risk breakdown, MITRE, actions
+  let rd = ev.raw_data || {};
+  if (typeof rd === 'string') {
+    try { rd = JSON.parse(rd); } catch(e) { rd = {}; }
+  }
+  const exp = rd.explanation;
+  const reasons = exp && exp.reasons ? exp.reasons.slice(0,3) : [];
+  const actions = ev.auto_action_taken ? ev.auto_action_taken : '';
+  const chips = [];
+  if (ev.mitre_tactic) chips.push(`<span style="font-size:0.62rem;padding:2px 6px;border:1px solid var(--border);border-radius:999px;color:var(--text-muted);">MITRE: ${ev.mitre_tactic}</span>`);
+  if (actions) chips.push(`<span style="font-size:0.62rem;padding:2px 6px;border:1px solid rgba(255,23,68,0.25);border-radius:999px;color:var(--red);">Auto: ${actions}</span>`);
+  if (!reasons.length && !chips.length) return '';
+
+  return `
+    <div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:6px;">
+      ${chips.join('')}
+    </div>
+    ${reasons.length ? `<div style="margin-top:6px;color:var(--text-muted);font-size:0.68rem">
+      <span style="color:var(--accent);font-weight:600">Threat Reason:</span> ${reasons.map(r=>`<span style="font-family:var(--mono)">${escapeHtml(r)}</span>`).join(' • ')}
+    </div>` : ''}
+  `;
+}
+
+function escapeHtml(s) {
+  return (s||'').toString().replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');
 }
 
 function prependThreat(ev) {
@@ -787,11 +847,69 @@ async function fetchStatus() {
   } catch(e) { setOnline(false); }
 }
 
+async function fetchRisk() {
+  try {
+    const r = await fetch('/api/risk');
+    if (!r.ok) return;
+    const d = await r.json();
+    const latest = d.latest;
+    if (!latest) return;
+    const rs = latest.risk_score;
+    const lbl = latest.risk_label || latest.severity || '—';
+
+    if (rs != null) {
+      $('risk-score').textContent = rs;
+      $('risk-label').textContent = lbl;
+      const fill = $('gf-risk');
+      const pct = clamp(rs, 0, 100);
+      fill.style.width = pct + '%';
+      fill.className = 'gauge-fill' + (pct >= 81 ? ' crit' : pct >= 61 ? ' warn' : '');
+      $('risk-meta').textContent = `${latest.rule_id || ''} • ${latest.mitre_tactic || '—'} • ${latest.auto_action_taken ? 'Auto response executed' : 'No auto response'}`;
+    }
+
+    // Top process list from ML snapshot_context if present
+    let rd = latest.raw_data || null;
+    if (typeof rd === 'string') {
+      try { rd = JSON.parse(rd); } catch(e) { rd = null; }
+    }
+    const ctx = rd && rd.snapshot_context ? rd.snapshot_context : null;
+    const procs = ctx && ctx.processes ? ctx.processes : [];
+    renderTopProcs(procs);
+  } catch(e) {}
+}
+
+function renderTopProcs(procs) {
+  const el = $('top-procs');
+  if (!el) return;
+  if (!procs || !procs.length) {
+    el.innerHTML = `<div class="empty-state" style="padding:18px"><div class="icon">⚙️</div>No process data yet</div>`;
+    return;
+  }
+  const rows = procs.slice(0,8).map(p => {
+    const cpu = (p.cpu_percent ?? 0).toFixed(1);
+    const mem = (p.memory_percent ?? 0).toFixed(1);
+    return `<div style="padding:10px 12px;border:1px solid rgba(30,45,69,0.5);border-radius:10px;background:var(--bg-card2);display:flex;justify-content:space-between;gap:12px;">
+      <div style="min-width:0;">
+        <div style="font-family:var(--mono);font-size:0.72rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(p.name||'unknown')} (PID ${p.pid||'—'})</div>
+        <div style="font-size:0.65rem;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(p.cmdline||'')}</div>
+      </div>
+      <div style="font-family:var(--mono);font-size:0.72rem;white-space:nowrap;color:var(--accent);">
+        CPU ${cpu}%<br><span style="color:var(--text-muted)">MEM ${mem}%</span>
+      </div>
+    </div>`;
+  });
+  el.innerHTML = rows.join('');
+}
 async function fetchThreats() {
   try {
     const r = await fetch('/api/threats?limit=100');
     const d = await r.json();
-    state.threats = d.threats || [];
+    state.threats = (d.threats || []).map(t => {
+      if (typeof t.raw_data === 'string') {
+        try { t.raw_data = JSON.parse(t.raw_data); } catch(e) {}
+      }
+      return t;
+    });
 
     const counts = d.counts || {};
     $('cnt-critical').textContent = counts['Critical'] || 0;
@@ -894,12 +1012,14 @@ async function exportReport() {
   fetchThreats();
   fetchVulns();
   fetchIntel();
+  fetchRisk();
   connectSSE();
 
   setInterval(fetchStatus, 5000);
   setInterval(fetchThreats, 15000);
   setInterval(fetchVulns,   60000);
   setInterval(fetchIntel,   30000);
+  setInterval(fetchRisk,    5000);
 })();
 </script>
 </body>

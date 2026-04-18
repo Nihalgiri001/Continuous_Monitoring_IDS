@@ -152,7 +152,7 @@ def main():
     trainer  = ModelTrainer()
     detector = AnomalyDetector(trainer)
     trainer.start()
-    #detector.start()
+    detector.start()
 
     logger.info("[6/8] Starting Alert Manager…")
     exporter = ReportExporter(db)

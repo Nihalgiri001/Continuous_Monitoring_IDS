@@ -18,6 +18,7 @@ from config import ML_ANOMALY_SCORE_THRESHOLD, ML_ANOMALY_CONSECUTIVE_HITS
 from core.event_queue import event_queue, threat_queue, safe_get, safe_put
 from core.threat_event import ThreatEvent, SystemSnapshot
 from ml_engine.trainer import load_model, ModelTrainer
+from ml_engine.explainability import ExplainableThreatAnalyzer, FEATURE_NAMES
 
 logger = logging.getLogger(__name__)
 
@@ -37,6 +38,7 @@ class AnomalyDetector(threading.Thread):
         self._threshold = float(ML_ANOMALY_SCORE_THRESHOLD)
         self._consecutive_hits = 0
         self._stop_event = threading.Event()
+        self._explainer = ExplainableThreatAnalyzer()
 
     def stop(self):
         self._stop_event.set()
@@ -80,6 +82,24 @@ class AnomalyDetector(threading.Thread):
         vec = np.array(snap.to_feature_vector()).reshape(1, -1)
         return float(self._model.score_samples(vec)[0])
 
+    def _snapshot_context(self, snap: SystemSnapshot) -> dict:
+        """
+        Compact context used for explanations and later auto-response.
+        Keep this small because it is stored in SQLite raw_data.
+        """
+        try:
+            processes = (snap.processes or [])[:10]
+            connections = (snap.connections or [])[:50]
+            file_events = (snap.file_events or [])[:25]
+            return {
+                "processes": processes,
+                "connections": connections,
+                "file_events": file_events,
+                "listening_ports": (snap.listening_ports or [])[:50],
+            }
+        except Exception:
+            return {}
+
     def run(self):
         self._wait_for_model()
         if self._model is None:
@@ -110,6 +130,12 @@ class AnomalyDetector(threading.Thread):
 
                 if self._consecutive_hits >= int(ML_ANOMALY_CONSECUTIVE_HITS):
                     fv = snap.to_feature_vector()
+                    ctx = self._snapshot_context(snap)
+                    explanation = self._explainer.explain_ml_anomaly(
+                        model=self._model,
+                        feature_vector=fv,
+                        snapshot_context=ctx,
+                    )
                     evt = ThreatEvent(
                         rule_id="ML_ANOMALY",
                         description=(
@@ -120,9 +146,16 @@ class AnomalyDetector(threading.Thread):
                         raw_data={
                             "ml_score": score,
                             "feature_vector": fv,
+                            "feature_names": FEATURE_NAMES,
                             "threshold": self._threshold,
                             "consecutive_hits": self._consecutive_hits,
                             "required_hits": int(ML_ANOMALY_CONSECUTIVE_HITS),
+                            "explanation": {
+                                "method": explanation.method,
+                                "reasons": explanation.reasons,
+                                "feature_contributions": explanation.feature_contributions,
+                            },
+                            "snapshot_context": ctx,
                         },
                         source="ml_engine",
                     )
