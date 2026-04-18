@@ -127,7 +127,7 @@ INTEL_REFRESH_INTERVAL_SECONDS = 3600  # Refresh blacklists every hour
 # Dashboard
 # ──────────────────────────────────────────────
 DASHBOARD_HOST = "127.0.0.1"
-DASHBOARD_PORT = 5000
+DASHBOARD_PORT = 5050
 DASHBOARD_DEBUG = False
 MAX_THREATS_IN_UI = 200               # Max threat events shown in dashboard
 

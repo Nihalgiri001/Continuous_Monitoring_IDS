@@ -1,0 +1,301 @@
+CyberCBP Security Report
+Generated At,2026-04-18T23:36:13.400178
+Total Threats,154
+Total Vulnerabilities,137
+
+=== THREATS ===
+ID,Timestamp,Severity,Rule ID,Source,Description
+17593e60…,2026-04-18 23:35:10,Medium,WORLD_WRITABLE_PATH,scanner,World-writable file detected: /tmp/.getscreen.me/memory/getscreen.me.app.shm
+142f59f2…,2026-04-18 23:35:10,Medium,WORLD_WRITABLE_PATH,scanner,World-writable file detected: /tmp/.getscreen.me/getscreen.me.gui
+773ba1b8…,2026-04-18 23:34:49,Medium,WORLD_WRITABLE_PATH,scanner,World-writable file detected: /tmp/.getscreen.me/memory/getscreen.me.app.shm
+73fae755…,2026-04-18 23:34:49,Medium,WORLD_WRITABLE_PATH,scanner,World-writable file detected: /tmp/.getscreen.me/getscreen.me.gui
+d38f4600…,2026-04-18 23:34:44,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+0ba73e07…,2026-04-18 23:34:44,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+783e07bf…,2026-04-18 23:32:41,Medium,WORLD_WRITABLE_PATH,scanner,World-writable file detected: /tmp/.getscreen.me/memory/getscreen.me.app.shm
+5285bbdc…,2026-04-18 23:32:41,Medium,WORLD_WRITABLE_PATH,scanner,World-writable file detected: /tmp/.getscreen.me/getscreen.me.gui
+2dd41e8b…,2026-04-18 23:32:36,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+f55bcd83…,2026-04-18 23:32:36,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+c01545a2…,2026-04-18 23:32:34,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+57888e03…,2026-04-18 23:32:34,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+bcb92970…,2026-04-18 23:29:18,Medium,WORLD_WRITABLE_PATH,scanner,World-writable file detected: /tmp/.getscreen.me/memory/getscreen.me.app.shm
+327ba3b4…,2026-04-18 23:29:18,Medium,WORLD_WRITABLE_PATH,scanner,World-writable file detected: /tmp/.getscreen.me/getscreen.me.gui
+de19585a…,2026-04-18 23:29:13,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+e1f4ea6a…,2026-04-18 23:29:13,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+1ec5c129…,2026-04-18 23:27:34,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+9650996e…,2026-04-18 23:27:34,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+857cd13b…,2026-04-18 23:22:34,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+d720e5c0…,2026-04-18 23:22:34,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+a7880524…,2026-04-18 23:17:34,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+b783900e…,2026-04-18 23:17:34,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+28bbd5ac…,2026-04-18 23:12:34,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+8d9f0052…,2026-04-18 23:12:34,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+c5b7a0f1…,2026-04-18 23:07:34,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+f6a0de4d…,2026-04-18 23:07:34,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+e08ab3b1…,2026-04-18 23:02:34,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+da0bd5b6…,2026-04-18 23:02:34,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+4073b1c9…,2026-04-18 22:57:34,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+e84e1c23…,2026-04-18 22:57:34,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+cbd6024b…,2026-04-18 22:52:34,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+c09edb8b…,2026-04-18 22:52:34,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+3be5896a…,2026-04-18 22:47:34,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+2e2c0133…,2026-04-18 22:47:34,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+215d422f…,2026-04-18 22:42:34,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+abe149d5…,2026-04-18 22:42:34,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+c1c864e5…,2026-04-18 22:37:34,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+b09bd5fd…,2026-04-18 22:37:34,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+dd84f70b…,2026-04-18 22:32:33,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+a60a9025…,2026-04-18 22:32:33,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+90ae211d…,2026-04-18 22:27:33,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+da12aeea…,2026-04-18 22:27:33,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+a1e428a5…,2026-04-18 22:22:33,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+06b0adb9…,2026-04-18 22:22:33,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+25cf49aa…,2026-04-18 22:17:33,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+d77a2ff7…,2026-04-18 22:17:33,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+be5b800b…,2026-04-18 22:12:33,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+e4af2ec0…,2026-04-18 22:12:33,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+88b7ac4c…,2026-04-18 22:07:33,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+e1183d82…,2026-04-18 22:07:33,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+69455988…,2026-04-18 22:02:33,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+869feff0…,2026-04-18 22:02:33,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+9c0751f4…,2026-04-18 21:57:33,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+b41971c8…,2026-04-18 21:57:33,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+8bac4d44…,2026-04-18 21:52:33,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+dbf53d1f…,2026-04-18 21:52:33,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+82fb0fe9…,2026-04-18 21:47:33,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+c9713668…,2026-04-18 21:47:33,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+d20d6581…,2026-04-18 21:42:33,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+640ef831…,2026-04-18 21:42:33,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+4ff79f4b…,2026-04-18 21:37:33,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+e8dde696…,2026-04-18 21:37:33,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+e9527a91…,2026-04-18 21:32:33,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+6656b393…,2026-04-18 21:32:33,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+df6c13b7…,2026-04-18 21:27:32,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+c29a9504…,2026-04-18 21:27:32,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+8f8b9f6c…,2026-04-18 21:22:32,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+7ea11f29…,2026-04-18 21:22:32,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+832a6bc3…,2026-04-18 21:17:32,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+15de2515…,2026-04-18 21:17:32,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+b7bf975d…,2026-04-18 21:12:32,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+cc4f7a7d…,2026-04-18 21:12:32,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+e7ef8b8d…,2026-04-18 21:07:32,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+9ae40c96…,2026-04-18 21:07:32,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+8fd3fc6f…,2026-04-18 21:02:32,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+e951e8d4…,2026-04-18 21:02:32,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+90024ba3…,2026-04-18 20:57:32,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+4f95ff09…,2026-04-18 20:57:32,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+6ae6944f…,2026-04-18 20:52:32,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+b84788f0…,2026-04-18 20:52:32,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+1b00aa35…,2026-04-18 20:47:32,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+18d4880d…,2026-04-18 20:47:32,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+36074ef1…,2026-04-18 20:42:32,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+3a2936c8…,2026-04-18 20:42:32,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+8668bb36…,2026-04-18 20:37:32,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+5188c4ec…,2026-04-18 20:37:32,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+d8b10869…,2026-04-18 20:32:32,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+e5389de9…,2026-04-18 20:32:32,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+d55b56ce…,2026-04-18 20:27:32,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+26e30e56…,2026-04-18 20:27:32,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+cc8fbbf8…,2026-04-18 20:22:31,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+52098043…,2026-04-18 20:22:31,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+28642368…,2026-04-18 20:17:31,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+1fc18680…,2026-04-18 20:17:31,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+b6040352…,2026-04-18 20:12:31,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+a2cdb0be…,2026-04-18 20:12:31,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+f5eb89e9…,2026-04-18 20:07:31,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+41afcf1a…,2026-04-18 20:07:31,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+82f47502…,2026-04-18 20:02:31,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+21d2c4ea…,2026-04-18 20:02:31,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+83ebaaed…,2026-04-18 19:57:31,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+d720a870…,2026-04-18 19:57:31,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+c786a9f4…,2026-04-18 19:52:31,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+92ebacce…,2026-04-18 19:52:31,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+e79d66d4…,2026-04-18 19:47:31,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+2d7de876…,2026-04-18 19:47:31,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+2d0eac53…,2026-04-18 19:42:31,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+9076011e…,2026-04-18 19:42:31,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+086b1ead…,2026-04-18 19:37:31,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+dd98ce97…,2026-04-18 19:37:31,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+4a1b32f5…,2026-04-18 19:32:31,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+87aa745a…,2026-04-18 19:32:31,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+eaf03ba3…,2026-04-18 19:27:31,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+e4a53d2a…,2026-04-18 19:27:31,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+9d361259…,2026-04-18 19:22:31,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+e19b8ab0…,2026-04-18 19:22:31,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+0a27875c…,2026-04-18 19:17:30,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+cd9868d5…,2026-04-18 19:17:30,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+b8f5ebd3…,2026-04-18 19:14:41,Medium,WORLD_WRITABLE_PATH,scanner,World-writable file detected: /tmp/.getscreen.me/memory/getscreen.me.app.shm
+b1873f7e…,2026-04-18 19:14:41,Medium,WORLD_WRITABLE_PATH,scanner,World-writable file detected: /tmp/.getscreen.me/getscreen.me.gui
+c4c9f137…,2026-04-18 19:14:36,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+918a6704…,2026-04-18 19:14:36,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+4eca6bee…,2026-04-18 19:12:35,Medium,WORLD_WRITABLE_PATH,scanner,World-writable file detected: /tmp/.getscreen.me/memory/getscreen.me.app.shm
+08638b96…,2026-04-18 19:12:35,Medium,WORLD_WRITABLE_PATH,scanner,World-writable file detected: /tmp/.getscreen.me/getscreen.me.gui
+d7fa169f…,2026-04-18 19:12:35,Critical,FIREWALL_DISABLED,scanner,macOS Application Firewall is DISABLED — system is exposed to network threats
+2b2f6622…,2026-04-18 19:12:30,Medium,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+89fe8bdb…,2026-04-18 19:12:30,Medium,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+aa4aa226…,2026-04-14 23:12:08,Medium,HIGH_CPU,rules_engine,Process 'mediaanalysisd' (PID 711) is using 101.0% CPU
+0cb23790…,2026-04-14 23:11:08,Medium,HIGH_CPU,rules_engine,Process 'mediaanalysisd' (PID 711) is using 97.6% CPU
+882cd0da…,2026-04-14 23:11:00,High,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+9608d7fe…,2026-04-14 23:11:00,High,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+d096c02d…,2026-04-14 13:12:19,High,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+4c7c80a7…,2026-04-14 13:12:19,High,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+ce6427fe…,2026-04-14 13:09:00,High,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+962d1d5d…,2026-04-14 13:09:00,High,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+6db1d37f…,2026-04-14 12:51:40,High,OPEN_RISKY_PORT,scanner,MySQL — database port should not be public
+a76800a7…,2026-04-14 12:51:40,High,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+5bca0141…,2026-04-06 15:24:37,High,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+6f874c9f…,2026-04-06 10:38:30,High,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+6c3f4774…,2026-04-06 10:33:30,High,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+7d69bbb8…,2026-04-06 10:32:13,Anomaly,ML_ANOMALY,ml_engine,Anomaly detected by ML engine (score=-0.5000). CPU=3.1% MEM=67.8% PROCS=843 CONNS=0
+5e122ad5…,2026-04-06 10:31:59,High,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+d6034b6f…,2026-04-06 10:30:16,Anomaly,ML_ANOMALY,ml_engine,Anomaly detected by ML engine (score=-0.5000). CPU=10.4% MEM=67.9% PROCS=845 CONNS=0
+7fe13e62…,2026-04-06 10:29:16,Anomaly,ML_ANOMALY,ml_engine,Anomaly detected by ML engine (score=-0.5000). CPU=12.9% MEM=68.6% PROCS=847 CONNS=0
+58b426fc…,2026-04-06 10:28:15,Anomaly,ML_ANOMALY,ml_engine,Anomaly detected by ML engine (score=-0.5000). CPU=3.7% MEM=68.8% PROCS=855 CONNS=0
+6114eeea…,2026-04-06 10:27:14,Anomaly,ML_ANOMALY,ml_engine,Anomaly detected by ML engine (score=-0.5000). CPU=6.4% MEM=68.2% PROCS=841 CONNS=0
+9ed1dc6d…,2026-04-06 10:27:06,High,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+cba978c2…,2026-04-03 22:16:36,Medium,HIGH_CPU,rules_engine,Process 'mediaanalysisd' (PID 711) is using 135.4% CPU
+246bce78…,2026-04-03 22:16:30,Anomaly,ML_ANOMALY,ml_engine,Anomaly detected by ML engine (score=-0.5000). CPU=13.0% MEM=62.7% PROCS=824 CONNS=0
+10da76e4…,2026-04-03 22:15:35,Medium,HIGH_CPU,rules_engine,Process 'mediaanalysisd' (PID 711) is using 97.9% CPU
+013d10b3…,2026-04-03 22:15:29,Anomaly,ML_ANOMALY,ml_engine,Anomaly detected by ML engine (score=-0.5000). CPU=13.2% MEM=62.3% PROCS=824 CONNS=0
+aee0f4f9…,2026-04-03 22:15:21,High,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+ce222d33…,2026-04-03 21:59:33,Anomaly,ML_ANOMALY,ml_engine,Anomaly detected by ML engine (score=-0.5000). CPU=1.3% MEM=61.9% PROCS=824 CONNS=0
+db71ae4f…,2026-04-03 21:59:25,High,OPEN_RISKY_PORT,scanner,SSH — ensure key-based auth & no root login
+
+=== VULNERABILITIES ===
+ID,Timestamp,Scanner,Port,Service,Severity,Detail
+137,2026-04-18 23:35:10,socket,3306,mysql,Medium,MySQL — database port should not be public
+136,2026-04-18 23:35:10,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+135,2026-04-18 23:34:44,socket,3306,mysql,Medium,MySQL — database port should not be public
+134,2026-04-18 23:34:44,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+133,2026-04-18 23:32:36,socket,3306,mysql,Medium,MySQL — database port should not be public
+132,2026-04-18 23:32:36,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+131,2026-04-18 23:32:34,socket,3306,mysql,Medium,MySQL — database port should not be public
+130,2026-04-18 23:32:34,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+129,2026-04-18 23:29:13,socket,3306,mysql,Medium,MySQL — database port should not be public
+128,2026-04-18 23:29:13,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+127,2026-04-18 23:27:34,socket,3306,mysql,Medium,MySQL — database port should not be public
+126,2026-04-18 23:27:34,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+125,2026-04-18 23:22:34,socket,3306,mysql,Medium,MySQL — database port should not be public
+124,2026-04-18 23:22:34,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+123,2026-04-18 23:17:34,socket,3306,mysql,Medium,MySQL — database port should not be public
+122,2026-04-18 23:17:34,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+121,2026-04-18 23:12:34,socket,3306,mysql,Medium,MySQL — database port should not be public
+120,2026-04-18 23:12:34,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+119,2026-04-18 23:07:34,socket,3306,mysql,Medium,MySQL — database port should not be public
+118,2026-04-18 23:07:34,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+117,2026-04-18 23:02:34,socket,3306,mysql,Medium,MySQL — database port should not be public
+116,2026-04-18 23:02:34,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+115,2026-04-18 22:57:34,socket,3306,mysql,Medium,MySQL — database port should not be public
+114,2026-04-18 22:57:34,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+113,2026-04-18 22:52:34,socket,3306,mysql,Medium,MySQL — database port should not be public
+112,2026-04-18 22:52:34,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+111,2026-04-18 22:47:34,socket,3306,mysql,Medium,MySQL — database port should not be public
+110,2026-04-18 22:47:34,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+109,2026-04-18 22:42:34,socket,3306,mysql,Medium,MySQL — database port should not be public
+108,2026-04-18 22:42:34,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+107,2026-04-18 22:37:34,socket,3306,mysql,Medium,MySQL — database port should not be public
+106,2026-04-18 22:37:34,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+105,2026-04-18 22:32:33,socket,3306,mysql,Medium,MySQL — database port should not be public
+104,2026-04-18 22:32:33,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+103,2026-04-18 22:27:33,socket,3306,mysql,Medium,MySQL — database port should not be public
+102,2026-04-18 22:27:33,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+101,2026-04-18 22:22:33,socket,3306,mysql,Medium,MySQL — database port should not be public
+100,2026-04-18 22:22:33,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+99,2026-04-18 22:17:33,socket,3306,mysql,Medium,MySQL — database port should not be public
+98,2026-04-18 22:17:33,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+97,2026-04-18 22:12:33,socket,3306,mysql,Medium,MySQL — database port should not be public
+96,2026-04-18 22:12:33,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+95,2026-04-18 22:07:33,socket,3306,mysql,Medium,MySQL — database port should not be public
+94,2026-04-18 22:07:33,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+93,2026-04-18 22:02:33,socket,3306,mysql,Medium,MySQL — database port should not be public
+92,2026-04-18 22:02:33,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+91,2026-04-18 21:57:33,socket,3306,mysql,Medium,MySQL — database port should not be public
+90,2026-04-18 21:57:33,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+89,2026-04-18 21:52:33,socket,3306,mysql,Medium,MySQL — database port should not be public
+88,2026-04-18 21:52:33,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+87,2026-04-18 21:47:33,socket,3306,mysql,Medium,MySQL — database port should not be public
+86,2026-04-18 21:47:33,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+85,2026-04-18 21:42:33,socket,3306,mysql,Medium,MySQL — database port should not be public
+84,2026-04-18 21:42:33,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+83,2026-04-18 21:37:33,socket,3306,mysql,Medium,MySQL — database port should not be public
+82,2026-04-18 21:37:33,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+81,2026-04-18 21:32:33,socket,3306,mysql,Medium,MySQL — database port should not be public
+80,2026-04-18 21:32:33,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+79,2026-04-18 21:27:32,socket,3306,mysql,Medium,MySQL — database port should not be public
+78,2026-04-18 21:27:32,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+77,2026-04-18 21:22:32,socket,3306,mysql,Medium,MySQL — database port should not be public
+76,2026-04-18 21:22:32,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+75,2026-04-18 21:17:32,socket,3306,mysql,Medium,MySQL — database port should not be public
+74,2026-04-18 21:17:32,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+73,2026-04-18 21:12:32,socket,3306,mysql,Medium,MySQL — database port should not be public
+72,2026-04-18 21:12:32,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+71,2026-04-18 21:07:32,socket,3306,mysql,Medium,MySQL — database port should not be public
+70,2026-04-18 21:07:32,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+69,2026-04-18 21:02:32,socket,3306,mysql,Medium,MySQL — database port should not be public
+68,2026-04-18 21:02:32,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+67,2026-04-18 20:57:32,socket,3306,mysql,Medium,MySQL — database port should not be public
+66,2026-04-18 20:57:32,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+65,2026-04-18 20:52:32,socket,3306,mysql,Medium,MySQL — database port should not be public
+64,2026-04-18 20:52:32,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+63,2026-04-18 20:47:32,socket,3306,mysql,Medium,MySQL — database port should not be public
+62,2026-04-18 20:47:32,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+61,2026-04-18 20:42:32,socket,3306,mysql,Medium,MySQL — database port should not be public
+60,2026-04-18 20:42:32,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+59,2026-04-18 20:37:32,socket,3306,mysql,Medium,MySQL — database port should not be public
+58,2026-04-18 20:37:32,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+57,2026-04-18 20:32:32,socket,3306,mysql,Medium,MySQL — database port should not be public
+56,2026-04-18 20:32:32,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+55,2026-04-18 20:27:32,socket,3306,mysql,Medium,MySQL — database port should not be public
+54,2026-04-18 20:27:32,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+53,2026-04-18 20:22:31,socket,3306,mysql,Medium,MySQL — database port should not be public
+52,2026-04-18 20:22:31,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+51,2026-04-18 20:17:31,socket,3306,mysql,Medium,MySQL — database port should not be public
+50,2026-04-18 20:17:31,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+49,2026-04-18 20:12:31,socket,3306,mysql,Medium,MySQL — database port should not be public
+48,2026-04-18 20:12:31,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+47,2026-04-18 20:07:31,socket,3306,mysql,Medium,MySQL — database port should not be public
+46,2026-04-18 20:07:31,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+45,2026-04-18 20:02:31,socket,3306,mysql,Medium,MySQL — database port should not be public
+44,2026-04-18 20:02:31,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+43,2026-04-18 19:57:31,socket,3306,mysql,Medium,MySQL — database port should not be public
+42,2026-04-18 19:57:31,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+41,2026-04-18 19:52:31,socket,3306,mysql,Medium,MySQL — database port should not be public
+40,2026-04-18 19:52:31,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+39,2026-04-18 19:47:31,socket,3306,mysql,Medium,MySQL — database port should not be public
+38,2026-04-18 19:47:31,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+37,2026-04-18 19:42:31,socket,3306,mysql,Medium,MySQL — database port should not be public
+36,2026-04-18 19:42:31,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+35,2026-04-18 19:37:31,socket,3306,mysql,Medium,MySQL — database port should not be public
+34,2026-04-18 19:37:31,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+33,2026-04-18 19:32:31,socket,3306,mysql,Medium,MySQL — database port should not be public
+32,2026-04-18 19:32:31,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+31,2026-04-18 19:27:31,socket,3306,mysql,Medium,MySQL — database port should not be public
+30,2026-04-18 19:27:31,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+29,2026-04-18 19:22:31,socket,3306,mysql,Medium,MySQL — database port should not be public
+28,2026-04-18 19:22:31,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+27,2026-04-18 19:17:30,socket,3306,mysql,Medium,MySQL — database port should not be public
+26,2026-04-18 19:17:30,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+25,2026-04-18 19:14:36,socket,3306,mysql,Medium,MySQL — database port should not be public
+24,2026-04-18 19:14:36,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+23,2026-04-18 19:12:30,socket,3306,mysql,Medium,MySQL — database port should not be public
+22,2026-04-18 19:12:30,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+21,2026-04-14 23:11:00,socket,3306,mysql,Medium,MySQL — database port should not be public
+20,2026-04-14 23:11:00,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+19,2026-04-14 13:13:19,socket,3306,mysql,Medium,MySQL — database port should not be public
+18,2026-04-14 13:13:19,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+17,2026-04-14 13:12:19,socket,3306,mysql,Medium,MySQL — database port should not be public
+16,2026-04-14 13:12:19,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+15,2026-04-14 13:09:00,socket,3306,mysql,Medium,MySQL — database port should not be public
+14,2026-04-14 13:09:00,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+13,2026-04-14 12:51:40,socket,3306,mysql,Medium,MySQL — database port should not be public
+12,2026-04-14 12:51:40,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+11,2026-04-06 15:24:37,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+10,2026-04-06 10:38:30,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+9,2026-04-06 10:37:49,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+8,2026-04-06 10:33:30,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+7,2026-04-06 10:31:59,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+6,2026-04-06 10:27:06,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+5,2026-04-03 22:17:06,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+4,2026-04-03 22:16:04,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+3,2026-04-03 22:15:36,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+2,2026-04-03 22:15:21,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login
+1,2026-04-03 21:59:25,socket,22,ssh,Medium,SSH — ensure key-based auth & no root login

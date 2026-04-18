@@ -71,7 +71,7 @@ def _collect_connections() -> tuple[list[dict], list[int], int]:
             if c.status == "LISTEN" and c.laddr:
                 listening.append(c.laddr.port)
 
-    except (psutil.AccessDenied, PermissionError):
+    except (psutil.AccessDenied, PermissionError, OSError):
         logger.debug("Access denied for net_connections — try running with sudo")
 
     new_count = len(current_keys - _prev_connections)
@@ -81,16 +81,49 @@ def _collect_connections() -> tuple[list[dict], list[int], int]:
 
 def collect_snapshot() -> SystemSnapshot:
     """Build a complete system snapshot synchronously."""
-    cpu = psutil.cpu_percent(interval=1)
-    mem = psutil.virtual_memory()
-    procs = _collect_processes()
-    conns, listening, new_conns = _collect_connections()
+    cpu = 0.0
+    mem_percent = 0.0
+    mem_avail_mb = 0.0
+    num_procs = 0
+    procs: list[dict] = []
+    conns: list[dict] = []
+    listening: list[int] = []
+    new_conns = 0
+
+    # Collect each component independently so partial permission failures
+    # don't break snapshot delivery (which would stall the dashboard).
+    try:
+        cpu = psutil.cpu_percent(interval=1)
+    except Exception:
+        pass
+
+    try:
+        mem = psutil.virtual_memory()
+        mem_percent = float(mem.percent)
+        mem_avail_mb = float(mem.available) / (1024 * 1024)
+    except Exception:
+        pass
+
+    try:
+        procs = _collect_processes()
+    except Exception:
+        procs = []
+
+    try:
+        conns, listening, new_conns = _collect_connections()
+    except Exception:
+        conns, listening, new_conns = [], [], 0
+
+    try:
+        num_procs = len(psutil.pids())
+    except Exception:
+        num_procs = len(procs) if procs else 0
 
     return SystemSnapshot(
         cpu_percent=cpu,
-        memory_percent=mem.percent,
-        memory_available_mb=mem.available / (1024 * 1024),
-        num_processes=len(psutil.pids()),
+        memory_percent=mem_percent,
+        memory_available_mb=mem_avail_mb,
+        num_processes=num_procs,
         processes=procs,
         connections=conns,
         listening_ports=listening,

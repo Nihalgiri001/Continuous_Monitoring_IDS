@@ -29,6 +29,29 @@ python3 main.py  # Auto-integrates historical data
 
 ---
 
+## 🎯 Method 4: Calibrate with Demos (Reduce False Positives)
+
+This **does not retrain**. It tunes the saved IsolationForest **threshold** using:
+- **Normal**: your real machine usage (sampled for N minutes)
+- **Bad**: demo-style anomalous behaviors (same intent as `run_all_demos.sh`)
+
+```bash
+# 1) Ensure you already have a baseline model
+python3 main.py
+
+# 2) Calibrate (dry run)
+python3 calibrate_with_demos.py --minutes 60 --target-fpr 0.001
+
+# 3) Persist chosen threshold
+python3 calibrate_with_demos.py --minutes 60 --target-fpr 0.001 --write
+
+# 4) Restart and validate
+python3 main.py
+./run_all_demos.sh
+```
+
+---
+
 ## 📊 Data Collection Commands
 
 | Command | Purpose | Time |

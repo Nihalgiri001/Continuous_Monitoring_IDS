@@ -37,6 +37,7 @@ _db            = None
 _intel         = None
 _port_scanner  = None
 _exporter      = None
+_session_started_at: float | None = None  # used to scope "this session" vuln report
 _latest_snapshot = None
 _snapshot_lock  = threading.Lock()
 
@@ -47,11 +48,12 @@ _sse_lock = threading.Lock()
 
 def init_app(db, intel, port_scanner, exporter):
     """Called by main.py to inject dependencies."""
-    global _db, _intel, _port_scanner, _exporter
+    global _db, _intel, _port_scanner, _exporter, _session_started_at
     _db           = db
     _intel        = intel
     _port_scanner = port_scanner
     _exporter     = exporter
+    _session_started_at = time.time()
 
 
 def push_event_to_sse(event_dict: dict):
@@ -129,7 +131,11 @@ def api_vulnerabilities():
     if _db is None:
         return jsonify([])
     limit = min(int(request.args.get("limit", 50)), 200)
-    return jsonify(_db.get_vulnerabilities(limit=limit))
+    # Default: unique vulns seen in this dashboard session (since init_app).
+    # Use ?all=1 for full historical table (still deduped by port/service/detail).
+    all_hist = request.args.get("all", "").lower() in ("1", "true", "yes")
+    since = None if all_hist else _session_started_at
+    return jsonify(_db.get_vulnerabilities(limit=limit, since_timestamp=since))
 
 
 @app.route("/api/intel-stats")

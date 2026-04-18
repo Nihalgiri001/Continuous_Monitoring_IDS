@@ -232,22 +232,69 @@ class DatabaseManager:
 
     def insert_vulnerability(self, scanner: str, port: int, service: str,
                               severity: str, detail: str) -> None:
+        """
+        Insert or refresh a finding. Same (port, service, detail) is one unique
+        vulnerability — repeated scans update timestamp instead of duplicating rows.
+        """
         import time
         with self._lock:
             with self._connect() as conn:
-                conn.execute(
-                    """INSERT INTO vulnerabilities
-                       (timestamp, scanner, port, service, severity, detail)
-                       VALUES (?,?,?,?,?,?)""",
-                    (time.time(), scanner, port, service, severity, detail),
-                )
+                existing = conn.execute(
+                    """SELECT id FROM vulnerabilities
+                       WHERE port = ? AND IFNULL(service,'') = IFNULL(?, '')
+                         AND IFNULL(detail,'') = IFNULL(?, '')""",
+                    (port, service, detail),
+                ).fetchone()
+                ts = time.time()
+                if existing:
+                    conn.execute(
+                        """UPDATE vulnerabilities
+                           SET timestamp = ?, scanner = ?, severity = ?
+                           WHERE id = ?""",
+                        (ts, scanner, severity, existing["id"]),
+                    )
+                else:
+                    conn.execute(
+                        """INSERT INTO vulnerabilities
+                           (timestamp, scanner, port, service, severity, detail)
+                           VALUES (?,?,?,?,?,?)""",
+                        (ts, scanner, port, service, severity, detail),
+                    )
 
-    def get_vulnerabilities(self, limit: int = 100) -> list[dict]:
+    def get_vulnerabilities(
+        self, limit: int = 100, since_timestamp: Optional[float] = None
+    ) -> list[dict]:
+        """
+        Latest finding per unique (port, service, detail), most recently seen first.
+        Historical duplicate rows are collapsed for the report.
+
+        If since_timestamp is set, only rows with timestamp >= that value are
+        considered (e.g. current app session).
+        """
         with self._connect() as conn:
-            rows = conn.execute(
-                "SELECT * FROM vulnerabilities ORDER BY timestamp DESC LIMIT ?", (limit,)
-            ).fetchall()
-        return [dict(r) for r in rows]
+            if since_timestamp is not None:
+                rows = conn.execute(
+                    """SELECT * FROM vulnerabilities
+                       WHERE timestamp >= ?
+                       ORDER BY timestamp DESC""",
+                    (float(since_timestamp),),
+                ).fetchall()
+            else:
+                rows = conn.execute(
+                    "SELECT * FROM vulnerabilities ORDER BY timestamp DESC"
+                ).fetchall()
+        seen: set[tuple] = set()
+        out: list[dict] = []
+        for r in rows:
+            d = dict(r)
+            key = (d.get("port"), d.get("service") or "", d.get("detail") or "")
+            if key in seen:
+                continue
+            seen.add(key)
+            out.append(d)
+            if len(out) >= limit:
+                break
+        return out
 
     # ── Snapshots ─────────────────────────────────────────────────────────────
 
