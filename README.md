@@ -29,187 +29,170 @@ Threat Intel ← IntelManager (loaded from feeds/) ← rules engine queries
 | Config Auditor | `scanner/config_auditor.py` | SSH, firewall, world-writable checks |
 | Alert Manager | `alerts/alert_manager.py` | Rate-limited, dedup'd notifier dispatch |
 | Console Notifier | `alerts/notifiers/console.py` | Rich color-coded terminal output |
-| Desktop Notifier | `alerts/notifiers/desktop.py` | macOS native notifications |
-| Report Exporter | `reports/exporter.py` | JSON + CSV export |
-| Dashboard | `dashboard/` | Flask API + real-time SSE frontend |
-| Database | `db/database.py` | SQLite persistence |
+# CyberCBP — Continuous Monitoring IDS with ML Training Infrastructure
+
+A modular, production-inspired continuous monitoring system that detects threats using deterministic rules plus an IsolationForest-based anomaly detector. This README reflects the latest ML training infrastructure: long-running data collection, batch training, and documentation to produce expert-level models.
 
 ---
 
-## 🚀 Quick Start
+## Key additions
 
-### 1. Install dependencies
+- ML training infrastructure: `collect_training_data.py`, `train_on_historical.py`, and `ml_engine/historical_collector.py`.
+- Comprehensive ML docs: `ML_START_HERE.md`, `ML_TRAINING_WORKFLOW.md`, `ML_TRAINING_QUICK_REFERENCE.md`, `ML_INFRASTRUCTURE_SUMMARY.md`, `ML_DOCUMENTATION_INDEX.md`.
+- `ml_engine/data/` (historical snapshots) and `ml_engine/models/` (trained models) directories.
+- Recommended warmup increased to 600 samples (see `config.py`).
+
+---
+
+## 🚀 Quick Start (choose one)
+
+Install dependencies:
 
 ```bash
 cd "Cyber CBP"
 pip install -r requirements.txt
+# Optional (macOS): brew install nmap
 ```
 
-> **Optional**: Install `nmap` for enhanced port scanning:
-> ```bash
-> brew install nmap
-> ```
-
-### 2. Run the system
+Method 1 — Quick (50 minutes)
 
 ```bash
-python main.py
+python3 main.py
 ```
 
-The system will:
-1. Start all modules
-2. Collect baseline data for ML training (~5 minutes)
-3. Begin active anomaly detection
-4. Open the dashboard at **http://127.0.0.1:5000**
+• Auto-collects ~600 warmup samples (≈50 min at 5s interval). The system trains a baseline model and starts anomaly detection automatically.
 
-### 3. Run tests
+Method 2 — Production (overnight, recommended)
 
 ```bash
-# All three test suites
-python tests/test_high_cpu.py
-python tests/test_suspicious_port.py
-python tests/test_file_modification.py
+mkdir -p ml_engine/data ml_engine/models
+nohup python3 collect_training_data.py --hours 8 > collection.log 2>&1 &
+# Next morning
+python3 train_on_historical.py
+cp ml_engine/models/historical_baseline.pkl ml_engine/models/baseline.pkl
+python3 main.py
 ```
+
+Method 3 — Continuous (advanced)
+
+Edit `config.py`:
+
+```python
+ML_USE_HISTORICAL = True
+```
+
+Then run `python3 main.py` — the trainer will integrate historical data when available.
 
 ---
 
-## 🎛 Configuration (`config.py`)
+## 🔧 Configuration highlights (`config.py`)
 
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `MONITORING_INTERVAL_SECONDS` | `5` | How often to collect snapshots |
-| `CPU_ALERT_THRESHOLD` | `85.0` | % CPU per process to trigger alert |
-| `MEMORY_ALERT_THRESHOLD` | `90.0` | % total RAM to trigger alert |
-| `ALERT_COOLDOWN_SECONDS` | `60` | Rate-limit window between duplicate alerts |
-| `SCAN_INTERVAL_SECONDS` | `300` | Port scan frequency |
-| `ML_WARMUP_SAMPLES` | `60` | Snapshots to collect before ML training |
-| `ENABLE_DESKTOP_NOTIFICATIONS` | `True` | macOS native notifications |
-| `ENABLE_AUTO_BLOCK_IPS` | `False` | Auto-block via pfctl (needs sudo) |
+- `MONITORING_INTERVAL_SECONDS`: 5
+- `ML_WARMUP_SAMPLES`: 600
+- `ML_CONTAMINATION`: 0.01
+- `ML_ANOMALY_SCORE_THRESHOLD`: -0.10
+- `ML_USE_HISTORICAL`: False
+- `ALERT_COOLDOWN_SECONDS`: 60
 
-### Optional: VirusTotal Integration
-
-```bash
-export VT_API_KEY="your_api_key_here"
-python main.py
-```
-
-### Optional: Email Alerts
-
-```bash
-export SMTP_HOST="smtp.gmail.com"
-export ALERT_EMAIL_SENDER="you@gmail.com"
-export ALERT_EMAIL_RECIPIENT="you@gmail.com"
-export ALERT_EMAIL_PASSWORD="app_password"
-```
-Then set `ENABLE_EMAIL_ALERTS = True` in `config.py`.
+See `config.py` for full options.
 
 ---
 
-## 📊 Dashboard Features
+## 🧭 ML Training Flow (quick)
 
-Visit **http://127.0.0.1:5000**
+- `collect_training_data.py` — collects periodic snapshots into `.npy` checkpoint files under `ml_engine/data/`.
+- `train_on_historical.py` — loads all `.npy` snapshot files, trains an IsolationForest, and saves to `ml_engine/models/historical_baseline.pkl`.
+- Deploy by copying the trained model to `ml_engine/models/baseline.pkl` or updating the detector to load the new path.
 
-- **System Health Panel** — live CPU, memory, connection gauges
-- **Threat Severity Breakdown** — Critical / High / Medium / Low counts
-- **Live Threat Feed** — real-time SSE-pushed events with severity filter
-- **Vulnerability Report** — open ports with risk descriptions, sortable by severity
-- **Threat Intelligence Stats** — counts from all blacklist feeds
-- **Threats Over Time Chart** — Chart.js timeline
-- **⚡ Scan Now** — on-demand vulnerability scan
-- **📥 Export** — one-click JSON + CSV report export
+Recommended: collect 4–8 hours of diverse normal activity for a robust model (4k–5k samples). For quick testing, use `--hours 0.1`.
 
 ---
 
 ## 🔍 Detection Rules
 
-| Rule ID | Trigger | Severity |
-|---------|---------|---------|
-| `HIGH_CPU` | Process CPU > 85% | Medium |
-| `HIGH_MEMORY` | System RAM > 90% | Medium |
-| `BLACKLISTED_PROCESS` | Process name in feed | High |
-| `BLACKLISTED_IP` | Connection to known-bad IP | High |
-| `SUSPICIOUS_PORT` | Outbound to port 4444, 1337, 6666, etc. | High |
-| `RAPID_CONNECTIONS` | >30 new connections / interval | Medium |
-| `SENSITIVE_FILE_WRITE` | Modify in `/etc`, `/bin`, etc. | High |
-| `SENSITIVE_FILE_DELETE` | Delete from sensitive path | Critical |
-| `ROOT_SHELL_SPAWN` | bash/sh running as root | Critical |
-| `ML_ANOMALY` | IsolationForest score < threshold | Anomaly |
+The system combines deterministic rule-based detections and ML:
+
+- `HIGH_CPU`, `HIGH_MEMORY`, `BLACKLISTED_PROCESS`, `BLACKLISTED_IP`, `SUSPICIOUS_PORT`, `RAPID_CONNECTIONS`, `SENSITIVE_FILE_WRITE/DELETE`, `ROOT_SHELL_SPAWN`, `ML_ANOMALY`.
 
 ---
 
-## 🔌 Risky Port Risk Map (sample)
-
-| Port | Risk |
-|------|------|
-| 21 | FTP — plaintext credentials |
-| 23 | Telnet — fully unencrypted |
-| 445 | SMB — EternalBlue target |
-| 3389 | RDP — BlueKeep target |
-| 4444 | Metasploit default listener |
-| 6379 | Redis — often no auth |
-| 31337 | Back Orifice — critical |
-
----
-
-## 📁 Project Structure
+## � Project layout (updated)
 
 ```
 Cyber CBP/
-├── main.py                    # Orchestrator
-├── config.py                  # Central configuration
-├── requirements.txt
-├── cybercbp.log               # Runtime log (auto-created)
-├── core/
-│   ├── event_queue.py         # Central queue.Queue pipeline
-│   ├── severity.py            # Severity scoring system
-│   └── threat_event.py        # ThreatEvent + SystemSnapshot dataclasses
-├── agent/
-│   ├── monitor.py             # System snapshot collector
-│   └── file_watcher.py        # Watchdog file event monitor
-├── detection/
-│   └── rules_engine.py        # Rule-based IDS (8 rules)
+├── main.py
+├── config.py
+├── collect_training_data.py
+├── train_on_historical.py
 ├── ml_engine/
-│   ├── trainer.py             # IsolationForest baseline trainer
-│   ├── detector.py            # Live anomaly scoring
-│   └── models/                # Persisted model artifacts
-├── threat_intel/
-│   ├── intel_manager.py       # Blacklist manager
-│   ├── virustotal.py          # Optional VT API
-│   └── feeds/                 # IP / domain / process / hash feeds
-├── scanner/
-│   ├── port_scanner.py        # nmap + socket scanner + risk map
-│   └── config_auditor.py      # SSH / firewall / file permission checks
+│   ├── historical_collector.py
+│   ├── trainer.py
+│   ├── detector.py
+│   ├── data/
+│   └── models/
 ├── alerts/
-│   ├── alert_manager.py       # Rate-limited dispatcher
-│   ├── notifiers/
-│   │   ├── console.py         # Rich terminal output
-│   │   └── desktop.py         # macOS native notifications
-│   └── response/
-│       └── auto_block.py      # pfctl IP blocker (disabled by default)
-├── reports/
-│   ├── exporter.py            # JSON + CSV export engine
-│   └── exports/               # Generated report files
+├── agent/
+├── detection/
+├── scanner/
+├── threat_intel/
 ├── dashboard/
-│   ├── app.py                 # Flask API + SSE server
-│   └── templates/
-│       └── index.html         # Real-time dashboard UI
+├── reports/
 ├── db/
-│   ├── database.py            # SQLite schema + helpers
-│   └── cybercbp.db            # Database (auto-created)
 └── tests/
-    ├── test_high_cpu.py
-    ├── test_suspicious_port.py
-    └── test_file_modification.py
 ```
 
 ---
 
-## ⚠️ Notes
+## ✅ Quick commands
 
-- **macOS permissions**: Some features need Full Disk Access (System Preferences → Privacy). The system degrades gracefully without it.
-- **Auto-block**: Disabled by default. Requires `sudo` and explicit opt-in in `config.py`.
-- **ML warm-up**: The IsolationForest trains on your first 60 snapshots (~5 minutes at 5s intervals). Anomaly detection activates after training.
-- **OpenVAS**: Stubbed — wire in `scanner/openvas_stub.py` once you have an OpenVAS server running.
+Collect a short dataset (6 minutes):
+
+```bash
+python3 collect_training_data.py --hours 0.1
+```
+
+Train on collected data:
+
+```bash
+python3 train_on_historical.py
+```
+
+Deploy trained model:
+
+```bash
+cp ml_engine/models/historical_baseline.pkl ml_engine/models/baseline.pkl
+python3 main.py
+```
+
+---
+
+## 🧾 Documentation
+
+See the new ML documentation in repo root:
+
+- `ML_START_HERE.md` — main entry point
+- `ML_TRAINING_WORKFLOW.md` — full step-by-step guide
+- `ML_TRAINING_QUICK_REFERENCE.md` — quick cheat sheet
+- `ML_INFRASTRUCTURE_SUMMARY.md` — implementation notes
+- `ML_DOCUMENTATION_INDEX.md` — navigation index
+
+---
+
+## ⚠️ Notes and safety
+
+- Do not commit `ml_engine/data/` or `ml_engine/models/` to public repos; they may contain local metadata. A `.gitignore` file is included.
+- Auto-block is disabled by default and requires sudo and explicit opt-in.
+- Some features need macOS permissions (Full Disk Access).
+
+---
+
+## 🧪 Tests
+
+Run unit tests:
+
+```bash
+python3 -m pytest tests/
+```
 
 ---
 

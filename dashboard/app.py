@@ -10,6 +10,7 @@ Endpoints:
   GET  /api/stream         → Server-Sent Events stream (live threat feed)
   POST /api/scan           → Trigger on-demand vulnerability scan
   POST /api/export         → Export report (JSON + CSV)
+  POST /api/demo/snapshot  → Inject a demo snapshot into the live pipeline
 """
 
 import json
@@ -26,6 +27,8 @@ import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from config import DASHBOARD_HOST, DASHBOARD_PORT, DASHBOARD_DEBUG, MAX_THREATS_IN_UI
+from core.event_queue import safe_put, event_queue
+from core.threat_event import SystemSnapshot
 
 logger = logging.getLogger(__name__)
 
@@ -110,7 +113,7 @@ def api_threats():
     limit    = min(int(request.args.get("limit", 50)), MAX_THREATS_IN_UI)
     severity = request.args.get("severity")
     threats  = _db.get_threats(limit=limit, severity=severity)
-    counts   = _db.get_threat_counts()
+    counts   = _db.get_threat_counts(since_timestamp=_session_started_at)
     return jsonify({"threats": threats, "counts": counts})
 
 
@@ -221,6 +224,57 @@ def api_export():
             return jsonify({"status": "ok", "json": str(paths["json"]), "csv": str(paths["csv"])})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/demo/snapshot", methods=["POST"])
+def api_demo_snapshot():
+    """
+    Local-only helper for demo_suspicious_activity.py.
+    Accepts a serialized SystemSnapshot and optional temporary threat-intel
+    overrides, then injects the snapshot into the running main.py pipeline.
+    """
+    if not request.is_json:
+        return jsonify({"error": "JSON body required"}), 400
+
+    payload = request.get_json(silent=True) or {}
+    if not isinstance(payload, dict):
+        return jsonify({"error": "Invalid payload"}), 400
+
+    snap_payload = payload.get("snapshot") or {}
+    if not isinstance(snap_payload, dict):
+        return jsonify({"error": "snapshot must be an object"}), 400
+
+    try:
+        snap = SystemSnapshot(
+            cpu_percent=float(snap_payload.get("cpu_percent", 0.0) or 0.0),
+            memory_percent=float(snap_payload.get("memory_percent", 0.0) or 0.0),
+            memory_available_mb=float(snap_payload.get("memory_available_mb", 0.0) or 0.0),
+            num_processes=int(snap_payload.get("num_processes", 0) or 0),
+            processes=list(snap_payload.get("processes") or []),
+            connections=list(snap_payload.get("connections") or []),
+            listening_ports=list(snap_payload.get("listening_ports") or []),
+            num_new_connections=int(snap_payload.get("num_new_connections", 0) or 0),
+            file_events=list(snap_payload.get("file_events") or []),
+            log_entries=list(snap_payload.get("log_entries") or []),
+        )
+    except (TypeError, ValueError) as exc:
+        return jsonify({"error": f"Invalid snapshot fields: {exc}"}), 400
+
+    if snap.num_processes <= 0 and snap.processes:
+        snap.num_processes = len(snap.processes)
+
+    if _intel is not None:
+        overrides = payload.get("intel_overrides") or {}
+        if isinstance(overrides, dict):
+            with _intel._lock:
+                for ip in overrides.get("bad_ips") or []:
+                    _intel._bad_ips.add(str(ip).lower())
+                for proc in overrides.get("bad_processes") or []:
+                    _intel._bad_procs.add(str(proc).lower())
+
+    update_snapshot(snap)
+    safe_put(event_queue, snap)
+    return jsonify({"status": "queued"})
 
 
 def run_dashboard():

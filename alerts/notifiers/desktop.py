@@ -1,7 +1,7 @@
 """
 alerts/notifiers/desktop.py — macOS Desktop Notification
 
-Sends native macOS notifications for High/Critical alerts
+Sends native macOS notifications for Medium/High/Critical/Anomaly alerts
 via osascript (no external dependencies required).
 Silently skips on non-macOS platforms.
 """
@@ -16,7 +16,17 @@ from config import ENABLE_DESKTOP_NOTIFICATIONS
 
 logger = logging.getLogger(__name__)
 
-_NOTIFY_SEVERITIES = {Severity.HIGH, Severity.CRITICAL, Severity.ANOMALY}
+_NOTIFY_SEVERITIES = {
+    Severity.MEDIUM,
+    Severity.HIGH,
+    Severity.CRITICAL,
+    Severity.ANOMALY,
+}
+
+
+def _escape_applescript(text: str) -> str:
+    """Escape strings embedded into an AppleScript literal."""
+    return (text or "").replace("\\", "\\\\").replace('"', '\\"')
 
 
 class DesktopNotifier:
@@ -30,8 +40,8 @@ class DesktopNotifier:
         if platform.system() != "Darwin":
             return
 
-        title = f"🚨 CyberCBP — {event.severity.value.upper()}"
-        body  = f"{event.rule_id}: {event.description[:150]}"
+        title = _escape_applescript(f"CyberCBP — {event.severity.value.upper()}")
+        body = _escape_applescript(f"{event.rule_id}: {event.description[:150]}")
 
         try:
             script = (

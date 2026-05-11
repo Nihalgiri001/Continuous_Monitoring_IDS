@@ -221,11 +221,20 @@ class DatabaseManager:
                 ).fetchall()
         return [dict(r) for r in rows]
 
-    def get_threat_counts(self) -> dict:
+    def get_threat_counts(self, since_timestamp: Optional[float] = None) -> dict:
         with self._connect() as conn:
-            rows = conn.execute(
-                "SELECT severity, COUNT(*) as cnt FROM threats GROUP BY severity"
-            ).fetchall()
+            if since_timestamp is not None:
+                rows = conn.execute(
+                    """SELECT severity, COUNT(*) as cnt
+                       FROM threats
+                       WHERE timestamp >= ?
+                       GROUP BY severity""",
+                    (float(since_timestamp),),
+                ).fetchall()
+            else:
+                rows = conn.execute(
+                    "SELECT severity, COUNT(*) as cnt FROM threats GROUP BY severity"
+                ).fetchall()
         return {r["severity"]: r["cnt"] for r in rows}
 
     # ── Vulnerabilities ───────────────────────────────────────────────────────

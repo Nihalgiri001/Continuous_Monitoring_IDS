@@ -20,12 +20,15 @@ import multiprocessing
 import tempfile
 from pathlib import Path
 
+import requests
+
 sys.path.insert(0, str(Path(__file__).parent))
 
 from core.event_queue import event_queue, threat_queue, safe_put, safe_get
 from core.threat_event import SystemSnapshot, ThreatEvent
 from detection.rules_engine import RulesEngine
 from threat_intel.intel_manager import IntelManager
+from config import DASHBOARD_HOST, DASHBOARD_PORT
 
 # Colors for terminal output
 GREEN = '\033[92m'
@@ -36,6 +39,7 @@ MAGENTA = '\033[95m'
 CYAN = '\033[96m'
 BOLD = '\033[1m'
 RESET = '\033[0m'
+DEMO_API_URL = f"http://{DASHBOARD_HOST}:{DASHBOARD_PORT}/api/demo/snapshot"
 
 def print_header(text):
     print(f"\n{BOLD}{CYAN}{'='*70}{RESET}")
@@ -60,6 +64,27 @@ def print_error(msg):
 
 def print_detected(msg):
     print(f"{MAGENTA}🚨 DETECTED: {msg}{RESET}")
+
+
+def inject_snapshot(snapshot: SystemSnapshot, intel_overrides: dict | None = None):
+    """
+    Send the demo snapshot to the live CyberCBP process.
+    Falls back to the local in-process queue so the old unit-test style still works.
+    """
+    payload = {"snapshot": snapshot.__dict__}
+    if intel_overrides:
+        payload["intel_overrides"] = intel_overrides
+
+    try:
+        response = requests.post(DEMO_API_URL, json=payload, timeout=5)
+        response.raise_for_status()
+        print_status("Injected scenario into live CyberCBP pipeline")
+        return
+    except Exception as exc:
+        print_warning(
+            f"Live injection unavailable ({exc}). Falling back to local queue only."
+        )
+        safe_put(event_queue, snapshot)
 
 # ════════════════════════════════════════════════════════════════════
 # DEMO 1: HIGH CPU ANOMALY
@@ -102,7 +127,7 @@ def demo_high_cpu():
             connections=[],
             listening_ports=[],
         )
-        safe_put(event_queue, snap)
+        inject_snapshot(snap)
         
         elapsed = time.time() - start
         while elapsed < 30:
@@ -146,7 +171,7 @@ def demo_high_memory():
         connections=[],
         listening_ports=[],
     )
-    safe_put(event_queue, snap)
+    inject_snapshot(snap)
     
     print_status("Holding allocation for 30 seconds...")
     for i in range(30):
@@ -193,7 +218,7 @@ def demo_suspicious_port():
         ],
         listening_ports=[],
     )
-    safe_put(event_queue, snap)
+    inject_snapshot(snap)
     
     print_success("Connection simulated")
     print_warning("Check CyberCBP console for 🔴 SUSPICIOUS_PORT alert")
@@ -214,10 +239,6 @@ def demo_blacklisted_ip():
     print_status("Adding test IP to threat intel...")
     
     # Create and inject the threat intel
-    intel = IntelManager()
-    with intel._lock:
-        intel._bad_ips.add("203.0.113.50")
-    
     print_status("Simulating connection to blacklisted IP...")
     print_status("Expected Alert: 🔴 BLACKLISTED_IP")
     
@@ -242,7 +263,7 @@ def demo_blacklisted_ip():
         ],
         listening_ports=[],
     )
-    safe_put(event_queue, snap)
+    inject_snapshot(snap, intel_overrides={"bad_ips": ["203.0.113.50"]})
     
     print_success("Blacklisted IP connection simulated")
     print_warning("Check CyberCBP console for 🔴 BLACKLISTED_IP alert")
@@ -282,7 +303,7 @@ def demo_file_modification():
             {"type": "modify", "src": "/bin/ls", "dest": ""},
         ],
     )
-    safe_put(event_queue, snap)
+    inject_snapshot(snap)
     
     print_success("File modification simulated")
     print_warning("Check CyberCBP console for 🔴 SENSITIVE_FILE_WRITE alerts")
@@ -322,7 +343,7 @@ def demo_file_deletion():
             {"type": "delete", "src": "/bin/sh", "dest": ""},
         ],
     )
-    safe_put(event_queue, snap)
+    inject_snapshot(snap)
     
     print_success("File deletion simulated")
     print_error("Check CyberCBP console for 💀 SENSITIVE_FILE_DELETE alert (CRITICAL)")
@@ -367,7 +388,7 @@ def demo_root_shell():
         connections=[],
         listening_ports=[],
     )
-    safe_put(event_queue, snap)
+    inject_snapshot(snap)
     
     print_success("Root shell spawn simulated")
     print_error("Check CyberCBP console for 💀 ROOT_SHELL_SPAWN alert (CRITICAL)")
@@ -411,7 +432,7 @@ def demo_rapid_connections():
         listening_ports=[],
         num_new_connections=50,
     )
-    safe_put(event_queue, snap)
+    inject_snapshot(snap)
     
     print_success("Rapid connection burst simulated (50 connections)")
     print_warning("Check CyberCBP console for 🟡 RAPID_CONNECTIONS alert")
@@ -448,7 +469,7 @@ def demo_multi_stage_attack():
         listening_ports=[],
         num_new_connections=30,
     )
-    safe_put(event_queue, snap)
+    inject_snapshot(snap)
     print_detected("RAPID_CONNECTIONS")
     time.sleep(3)
     
@@ -463,7 +484,7 @@ def demo_multi_stage_attack():
         connections=[],
         listening_ports=[],
     )
-    safe_put(event_queue, snap)
+    inject_snapshot(snap)
     print_detected("HIGH_CPU")
     time.sleep(3)
     
@@ -480,7 +501,7 @@ def demo_multi_stage_attack():
         connections=[],
         listening_ports=[],
     )
-    safe_put(event_queue, snap)
+    inject_snapshot(snap)
     print_detected("ROOT_SHELL_SPAWN")
     time.sleep(3)
     
@@ -500,7 +521,7 @@ def demo_multi_stage_attack():
         ],
         listening_ports=[],
     )
-    safe_put(event_queue, snap)
+    inject_snapshot(snap, intel_overrides={"bad_ips": ["203.0.113.50"]})
     print_detected("SUSPICIOUS_PORT")
     print_detected("BLACKLISTED_IP")
     
